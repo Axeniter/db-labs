@@ -164,11 +164,22 @@ CREATE TABLE IF NOT EXISTS Orders
     FOREIGN KEY (customer_id) REFERENCES Customers(id)
 );
 
+CREATE TABLE IF NOT EXISTS CourierCompanies
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS Couriers
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    company_name VARCHAR(50),
-    is_free BOOLEAN DEFAULT 1
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    phone VARCHAR(20) UNIQUE,
+    is_free BOOLEAN DEFAULT 1,
+    company_id INTEGER,
+
+    FOREIGN KEY (company_id) REFERENCES CourierCompanies (id)
 );
 
 CREATE TABLE IF NOT EXISTS Deliveries
@@ -324,6 +335,9 @@ CREATE TABLE IF NOT EXISTS Customers
     is_active BOOLEAN DEFAULT 1,
     total_spent DECIMAL(10,2) DEFAULT 0,
     total_orders INTEGER DEFAULT 0
+    last_achieved_tier_id INTEGER,
+
+    FOREIGN KEY (last_achieved_tier_id) REFERENCES LoyaltyTiers (id)
 );
 
 CREATE TABLE IF NOT EXISTS LoyaltyTiers
@@ -375,6 +389,7 @@ CREATE TABLE IF NOT EXISTS Salaries
     bonuses DECIMAL(10,2) DEFAULT 0,
     deductions DECIMAL(10,2) DEFAULT 0,
     total_paid DECIMAL(10,2) NOT NULL,
+    total_hours INTEGER NOT NULL,
     payment_date DATE,
     is_paid BOOLEAN DEFAULT 0,
     

@@ -75,6 +75,27 @@ CREATE TABLE IF NOT EXISTS FinancialTransactionsCategories
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS FinancialTransactions
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transaction_type_id INTEGER NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    description TEXT,
+    category_id INTEGER,
+    
+    FOREIGN KEY (transaction_type_id) REFERENCES FinancialTransactionTypes(id),
+    FOREIGN KEY (category_id) REFERENCES FinancialTransactionsCategories(id)
+);
+
+CREATE TABLE IF NOT EXISTS LoyaltyTiers
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(30) NOT NULL UNIQUE,
+    min_spent DECIMAL(10,2) NOT NULL,
+    discount_percent DECIMAL(5,2) DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS Employees
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,10 +179,12 @@ CREATE TABLE IF NOT EXISTS Orders
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     closed_at DATETIME,
+    financial_transaction_id INTEGER,
 
     FOREIGN KEY (status_id) REFERENCES OrderStatuses(id),
     FOREIGN KEY (payment_type_id) REFERENCES PaymentTypes(id),
-    FOREIGN KEY (customer_id) REFERENCES Customers(id)
+    FOREIGN KEY (customer_id) REFERENCES Customers(id),
+    FOREIGN KEY (financial_transaction_id) REFERENCES FinancialTransactions(id)
 );
 
 CREATE TABLE IF NOT EXISTS CourierCompanies
@@ -195,7 +218,7 @@ CREATE TABLE IF NOT EXISTS Deliveries
     FOREIGN KEY (delivery_status_id) REFERENCES DeliveryStatuses (id)
 );
 
-CREATE TABLE IF NOT EXISTS TakeAways
+CREATE TABLE IF NOT EXISTS DineIns
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     order_id INTEGER NOT NULL,
@@ -253,10 +276,12 @@ CREATE TABLE IF NOT EXISTS SupplierOrders
     delivery_date DATETIME,
     status_id INTEGER NOT NULL,
     total_cost DECIMAL(10,2) DEFAULT 0,
+    financial_transaction_id INTEGER,
     
     FOREIGN KEY (supplier_id) REFERENCES Suppliers(id),
     FOREIGN KEY (employee_id) REFERENCES Employees(id),
-    FOREIGN KEY (status_id) REFERENCES SupplyStatuses(id)
+    FOREIGN KEY (status_id) REFERENCES SupplyStatuses(id),
+    FOREIGN KEY (financial_transaction_id) REFERENCES FinancialTransactions(id)
 );
 
 CREATE TABLE IF NOT EXISTS SupplierOrderItems
@@ -323,31 +348,6 @@ CREATE TABLE IF NOT EXISTS TimeTrackers
     FOREIGN KEY (employee_id) REFERENCES Employees (id)
 );
 
-CREATE TABLE IF NOT EXISTS Customers
-(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    phone VARCHAR(20) NOT NULL UNIQUE,
-    first_name VARCHAR(30),
-    last_name VARCHAR(30),
-    email VARCHAR(255),
-    birth_date DATE,
-    registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_active BOOLEAN DEFAULT 1,
-    total_spent DECIMAL(10,2) DEFAULT 0,
-    total_orders INTEGER DEFAULT 0
-    last_achieved_tier_id INTEGER,
-
-    FOREIGN KEY (last_achieved_tier_id) REFERENCES LoyaltyTiers (id)
-);
-
-CREATE TABLE IF NOT EXISTS LoyaltyTiers
-(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(30) NOT NULL UNIQUE,
-    min_spent DECIMAL(10,2) NOT NULL,
-    discount_percent DECIMAL(5,2) DEFAULT 0
-);
-
 CREATE TABLE IF NOT EXISTS LoyaltyTransactions
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -363,22 +363,6 @@ CREATE TABLE IF NOT EXISTS LoyaltyTransactions
     FOREIGN KEY (transaction_type_id) REFERENCES LoyaltyTransactionTypes(id)
 );
 
-CREATE TABLE IF NOT EXISTS FinancialTransactions
-(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    transaction_type_id INTEGER NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    description TEXT,
-    reference_id INTEGER,
-    reference_type_id INTEGER,
-    created_by_employee_id INTEGER,
-    
-    FOREIGN KEY (transaction_type_id) REFERENCES FinancialTransactionTypes(id),
-    FOREIGN KEY (created_by_employee_id) REFERENCES Employees(id),
-    FOREIGN KEY (reference_type_id) REFERENCES FinancialTransactionsCategories(id)
-);
-
 CREATE TABLE IF NOT EXISTS Salaries
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -392,6 +376,8 @@ CREATE TABLE IF NOT EXISTS Salaries
     total_hours INTEGER NOT NULL,
     payment_date DATE,
     is_paid BOOLEAN DEFAULT 0,
+    financial_transaction_id INTEGER,
     
-    FOREIGN KEY (employee_id) REFERENCES Employees(id)
+    FOREIGN KEY (employee_id) REFERENCES Employees(id),
+    FOREIGN KEY (financial_transaction_id) REFERENCES FinancialTransactions(id)
 );

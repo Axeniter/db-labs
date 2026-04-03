@@ -169,6 +169,23 @@ CREATE TABLE IF NOT EXISTS TableReservations (
     FOREIGN KEY (created_by_employee_id) REFERENCES Employees(id)
 );
 
+CREATE TABLE IF NOT EXISTS Customers
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
+    email VARCHAR(255),
+    birth_date DATE,
+    registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT 1,
+    total_spent DECIMAL(10,2) DEFAULT 0,
+    total_orders INTEGER DEFAULT 0,
+    last_achieved_tier_id INTEGER,
+
+    FOREIGN KEY (last_achieved_tier_id) REFERENCES LoyaltyTiers (id)
+);
+
 CREATE TABLE IF NOT EXISTS Orders
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

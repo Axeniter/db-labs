@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS Roles
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(30) NOT NULL UNIQUE,
-    salary DECIMAL(10,2)
+    hourly_rate DECIMAL(10,2)
 );
 
 CREATE TABLE IF NOT EXISTS MenuCategories
@@ -75,6 +75,15 @@ CREATE TABLE IF NOT EXISTS FinancialTransactionsCategories
     name VARCHAR(30) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS LoyaltyTiers
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(30) NOT NULL UNIQUE,
+    min_spent DECIMAL(10,2) NOT NULL,
+    discount_percent DECIMAL(5,2) DEFAULT 0,
+    cashback_percent DECIMAL(5,2) DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS FinancialTransactions
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,14 +95,6 @@ CREATE TABLE IF NOT EXISTS FinancialTransactions
     
     FOREIGN KEY (transaction_type_id) REFERENCES FinancialTransactionTypes(id),
     FOREIGN KEY (category_id) REFERENCES FinancialTransactionsCategories(id)
-);
-
-CREATE TABLE IF NOT EXISTS LoyaltyTiers
-(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(30) NOT NULL UNIQUE,
-    min_spent DECIMAL(10,2) NOT NULL,
-    discount_percent DECIMAL(5,2) DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS Employees
@@ -193,6 +194,7 @@ CREATE TABLE IF NOT EXISTS Orders
     status_id INTEGER NOT NULL,
     payment_type_id INTEGER NOT NULL,
     total_cost DECIMAL(10,2) DEFAULT 0,
+    to_pay DECIMAL(10,2) DEFAULT 0,
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     closed_at DATETIME,
@@ -359,8 +361,6 @@ CREATE TABLE IF NOT EXISTS TimeTrackers
     employee_id INTEGER NOT NULL,
     check_in DATETIME NOT NULL,
     check_out DATETIME,
-    break_start DATETIME,
-    break_end DATETIME,
     
     FOREIGN KEY (employee_id) REFERENCES Employees (id)
 );

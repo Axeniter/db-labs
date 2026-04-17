@@ -144,16 +144,16 @@ INSERT INTO Ingredients (name) VALUES
 ('Салат');
 
 INSERT INTO IngredientInventory (ingredient_id, unit_id, quantity) VALUES 
-(1, 1, 15.000),
-(2, 1, 25.000),
-(3, 3, 10.000),
-(4, 1, 8.000),
-(5, 3, 20.000),
+(1, 2, 15000.000),
+(2, 2, 25000.000),
+(3, 4, 10000.000),
+(4, 2, 8000.000),
+(5, 4, 20000.000),
 (6, 2, 2500.000),
-(7, 7, 30.000),
+(7, 4, 22500.000),
 (8, 5, 50.000),
-(9, 1, 5.000),
-(10, 1, 3.000);
+(9, 2, 5000.000),
+(10, 2, 3000.000);
 
 INSERT INTO MenuItems (category_id, name, description, price, calories, is_available) VALUES 
 (1, 'Кола', 'о', 150.00, 150, 1),
@@ -173,7 +173,7 @@ INSERT INTO RecipeItems (menu_item_id, ingredient_id, unit_id, quantity) VALUES
 (2, 6, 2, 10.000),
 (2, 3, 4, 150.000),
 (1, 5, 4, 250.000),
-(3, 7, 7, 500.000),
+(3, 7, 4, 500.000),
 (5, 2, 2, 100.000),
 (5, 4, 2, 30.000),
 (7, 4, 2, 50.000),
@@ -181,16 +181,16 @@ INSERT INTO RecipeItems (menu_item_id, ingredient_id, unit_id, quantity) VALUES
 (7, 3, 4, 100.000);
 
 INSERT INTO SupplierPrices (supplier_id, ingredient_id, unit_id, price_per_unit) VALUES 
-(1, 1, 1, 600.00),
-(1, 2, 1, 50.00),
-(2, 3, 3, 80.00),
-(2, 4, 1, 45.00),
-(3, 5, 3, 120.00),
-(3, 6, 1, 1500.00),
-(3, 7, 3, 200.00),
+(1, 1, 2, 0.60),
+(1, 2, 2, 0.05),
+(2, 3, 4, 0.08),
+(2, 4, 2, 0.045),
+(3, 5, 4, 0.12),
+(3, 6, 2, 1.50),
+(3, 7, 4, 0.27),
 (2, 8, 5, 25.00),
-(1, 9, 1, 550.00),
-(2, 10, 1, 180.00);
+(1, 9, 2, 0.55),
+(2, 10, 2, 0.18);
 
 INSERT INTO FinancialTransactions (transaction_type_id, amount, transaction_date, description, category_id) VALUES 
 (2, 50000.00, '2026-04-01 10:00:00', 'Аренда за апрель', 4),
@@ -199,7 +199,7 @@ INSERT INTO FinancialTransactions (transaction_type_id, amount, transaction_date
 (1, 890.00, '2026-04-05 20:45:00', 'Оплата заказа #2', 1),
 (2, 8000.00, '2026-04-10 11:00:00', 'Маркетинг', 5),
 (1, 1550.00, '2026-04-12 21:30:00', 'Оплата заказа #3', 1),
-(1, 320.00, '2026-04-12 21:30:00', 'Оплата заказа #4', 1);  
+(1, 320.00, '2026-04-12 21:30:00', 'Оплата заказа #4', 1);
 
 INSERT INTO SupplierOrders (supplier_id, employee_id, order_date, delivery_date, status_id, total_cost, financial_transaction_id) VALUES 
 (1, 2, '2026-04-02 09:00:00', '2026-04-03 14:00:00', 3, 12500.00, 2),
@@ -207,15 +207,15 @@ INSERT INTO SupplierOrders (supplier_id, employee_id, order_date, delivery_date,
 (3, 2, '2026-04-15 11:00:00', '2026-04-16 16:00:00', 2, 8900.00, NULL);
 
 INSERT INTO SupplierOrderItems (supplier_order_id, ingredient_id, unit_id, quantity, price_per_unit, total_cost) VALUES 
-(1, 1, 1, 10.000, 600.00, 6000.00),
-(1, 2, 1, 50.000, 50.00, 2500.00),
-(1, 9, 1, 8.000, 550.00, 4400.00),
-(2, 3, 3, 40.000, 80.00, 3200.00),
-(2, 4, 1, 30.000, 45.00, 1350.00),
+(1, 1, 2, 10000.000, 0.60, 6000.00),
+(1, 2, 2, 50000.000, 0.05, 2500.00),
+(1, 9, 2, 8000.000, 0.55, 4400.00),
+(2, 3, 4, 40000.000, 0.08, 3200.00),
+(2, 4, 2, 30000.000, 0.045, 1350.00),
 (2, 8, 5, 26.000, 25.00, 650.00),
-(3, 5, 3, 50.000, 120.00, 6000.00),
-(3, 7, 3, 10.000, 200.00, 2000.00),
-(3, 6, 1, 0.600, 1500.00, 900.00);
+(3, 5, 4, 50000.000, 0.12, 6000.00),
+(3, 7, 4, 10000.000, 0.27, 2700.00),
+(3, 6, 2, 600.000, 1.50, 900.00);
 
 INSERT INTO Orders (customer_id, status_id, payment_type_id, total_cost, to_pay, comment, created_at, closed_at, financial_transaction_id) VALUES 
 (1, 6, 2, 1250.00, 1250.00, 'Помедленнее', '2026-04-05 18:30:00', '2026-04-05 20:00:00', 3),
@@ -260,18 +260,19 @@ INSERT INTO IngredientOperations (employee_id, created_at) VALUES
 (4, '2026-04-16 11:00:00');
 
 INSERT INTO IngredientOperationItems (operation_id, ingredient_id, operation_type_id, unit_id, amount) VALUES 
-(1, 1, 1, 1, 10.000),
-(1, 2, 1, 1, 50.000),
-(1, 9, 1, 1, 8.000),
-(2, 3, 1, 3, 40.000),
-(2, 4, 1, 1, 30.000),
-(3, 1, 2, 2, 1.500),
-(3, 2, 2, 2, 3.200),
+(1, 1, 1, 2, 10000.000),
+(1, 2, 1, 2, 50000.000),
+(1, 9, 1, 2, 8000.000),
+(2, 3, 1, 4, 40000.000),
+(2, 4, 1, 2, 30000.000),
+(2, 8, 1, 5, 26.000),
+(3, 1, 2, 2, 1500.000),
+(3, 2, 2, 2, 3200.000),
 (3, 8, 2, 5, 4.000),
-(4, 1, 2, 2, 3.000),
-(4, 9, 2, 2, 1.200),
-(5, 5, 1, 3, 50.000),
-(5, 7, 1, 3, 10.000);
+(4, 1, 2, 2, 3000.000),
+(4, 9, 2, 2, 1200.000),
+(5, 5, 1, 4, 50000.000),
+(5, 7, 1, 4, 10000.000);
 
 INSERT INTO EmployeeSchedules (employee_id, shift_id, work_date, is_working) VALUES 
 (1, 1, '2026-04-01', 1),

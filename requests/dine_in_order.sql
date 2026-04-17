@@ -3,7 +3,7 @@ BEGIN TRANSACTION;
 -- создание заказа
 INSERT INTO Orders (customer_id, status_id, payment_type_id, total_cost, to_pay, comment)
 VALUES (
-    (SELECT id FROM Customers WHERE phone = '+79161234567'),  -- customer_id (если номера нет в программе лояльности, то NULL)
+    (SELECT id FROM Customers WHERE phone = '+79161234567'),  -- customer_id = "Наташа Дифференциал"
     1,                                                        -- status_id = "В ожидании"
     1,                                                        -- payment_type_id = "Наличные"
     0,

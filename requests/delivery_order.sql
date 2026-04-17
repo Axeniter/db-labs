@@ -3,12 +3,12 @@ BEGIN TRANSACTION;
 -- создание заказа
 INSERT INTO Orders (customer_id, status_id, payment_type_id, total_cost, to_pay, comment)
 VALUES (
-    (SELECT id FROM Customers WHERE phone = '+79161234567'),  -- customer_id (если номера нет в программе лояльности, то NULL)
+    (SELECT id FROM Customers WHERE phone = '+79163456789'),  -- customer_id (Каша Производная)
     1,                                                        -- status_id = "В ожидании"
-    1,                                                        -- payment_type_id = "Наличные"
+    2,                                                        -- payment_type_id = "Банковская карта"
     0,
     0,
-    'быстро быстро, супер срочно'
+    'у вас 30 минут'
 );
 
 -- временная таблица с айди заказа
@@ -23,10 +23,10 @@ SELECT
     mi.price,
     q.quantity
 FROM (
-    SELECT 6 AS id, 1 AS quantity UNION ALL -- Пятиэтажный бургер
-    SELECT 4, 1 UNION ALL                   -- Картофель три
-    SELECT 1, 2 UNION ALL                   -- Кола
-    SELECT 7, 1                             -- Сырный торт
+    SELECT 6 AS id, 2 AS quantity UNION ALL  -- Пятиэтажный бургер x2
+    SELECT 4, 1 UNION ALL                    -- Картофель три
+    SELECT 1, 3 UNION ALL                    -- Кола x3
+    SELECT 2, 2                              -- Кофе x2
 ) AS q
 JOIN MenuItems mi ON q.id = mi.id;
 
@@ -54,9 +54,14 @@ SET
     )
 WHERE id = (SELECT order_id FROM temp_order_id);
 
--- привязка стола к столу и официанту
-INSERT INTO DineIns (order_id, table_id, employee_id)
-VALUES ((SELECT order_id FROM temp_order_id), 3, 7);
+-- привязка к доставке
+INSERT INTO Deliveries (order_id, address, courier_id, delivery_status_id)
+VALUES (
+    (SELECT order_id FROM temp_order_id), 
+    'г. Новобобёрск, ул. Баробенко 42, кв 17', 
+    3,                                                        -- courier_id = Олег Бородатый
+    1                                                         -- delivery_status_id = "Собирается"
+);
 
 COMMIT;
 
@@ -66,21 +71,24 @@ SELECT
     o.created_at AS created_at,
     os.name AS status,
     pt.name AS payment_type,
-    t.number AS table_number,
-    e.first_name || ' ' || e.last_name AS waiter,
+    d.address AS delivery_address,
+    ds.name AS delivery_status,
+    c2.first_name || ' ' || c2.last_name AS courier,
+    cc.name AS courier_company,
     o.comment AS comment,
     o.total_cost AS total_cost,
+    o.to_pay AS to_pay,
     c.first_name || ' ' || c.last_name AS customer,
     c.phone AS customer_phone
 FROM Orders AS o
 JOIN OrderStatuses AS os ON o.status_id = os.id
 JOIN PaymentTypes AS pt ON o.payment_type_id = pt.id
-JOIN DineIns AS di ON o.id = di.order_id
-JOIN Tables AS t ON di.table_id = t.id
-JOIN Employees AS e ON di.employee_id = e.id
+JOIN Deliveries AS d ON o.id = d.order_id
+JOIN DeliveryStatuses AS ds ON d.delivery_status_id = ds.id
+JOIN Couriers AS c2 ON d.courier_id = c2.id
+LEFT JOIN CourierCompanies AS cc ON c2.company_id = cc.id
 LEFT JOIN Customers AS c ON o.customer_id = c.id
 WHERE o.id = (SELECT order_id FROM temp_order_id);
-
 SELECT
     mi.name AS item,
     oi.quantity AS quantity,

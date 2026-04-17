@@ -43,6 +43,10 @@ INSERT INTO DeliveryStatuses (name) VALUES
 ('Доставлен'),
 ('Отменён');
 
+INSERT INTO DineInStatuses (name) VALUES
+('Ожидание'),
+('Подано');
+
 INSERT INTO PaymentTypes (name, is_active) VALUES 
 ('Наличные', 1),
 ('Банковская карта', 1),
@@ -242,10 +246,10 @@ INSERT INTO Deliveries (order_id, address, courier_id, delivery_status_id) VALUE
 (3, 'г. Новобобёрск, ул. Рыбинская 15, кв 42', 2, 5),
 (5, 'г. Новобобёрск, ул. Васянская 8, кв 10', 1, 1);
 
-INSERT INTO DineIns (order_id, table_id, employee_id) VALUES 
-(1, 3, 7),
-(2, 1, 6),
-(4, 6, 6);
+INSERT INTO DineIns (order_id, table_id, employee_id, status_id) VALUES 
+(1, 3, 7, 2),
+(2, 1, 6, 2),
+(4, 6, 6, 1);
 
 INSERT INTO TableReservations (table_id, customer_phone, reservation_date, reservation_time, duration_minutes, created_by_employee_id) VALUES 
 (5, '+79161234567', '2026-04-20', '19:00:00', 120, 6),

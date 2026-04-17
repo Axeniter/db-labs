@@ -18,6 +18,12 @@ CREATE TABLE IF NOT EXISTS OrderStatuses
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS DineInStatuses
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(20) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS Shifts
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -250,9 +256,12 @@ CREATE TABLE IF NOT EXISTS DineIns
     order_id INTEGER NOT NULL,
     table_id INTEGER NOT NULL,
     employee_id INTEGER NOT NULL,
+    status_id INTEGER NOT NULL,
+
     FOREIGN KEY (order_id) REFERENCES Orders (id),
     FOREIGN KEY (table_id) REFERENCES Tables (id),
-    FOREIGN KEY (employee_id) REFERENCES Employees (id)
+    FOREIGN KEY (employee_id) REFERENCES Employees (id),
+    FOREIGN KEY (status_id) REFERENCES DineInStatuses (id)
 );
 
 CREATE TABLE IF NOT EXISTS OrderItems

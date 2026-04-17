@@ -55,8 +55,8 @@ SET
 WHERE id = (SELECT order_id FROM temp_order_id);
 
 -- привязка стола к столу и официанту
-INSERT INTO DineIns (order_id, table_id, employee_id)
-VALUES ((SELECT order_id FROM temp_order_id), 3, 7);
+INSERT INTO DineIns (order_id, table_id, employee_id, status_id)
+VALUES ((SELECT order_id FROM temp_order_id), 3, 7, 1);
 
 COMMIT;
 

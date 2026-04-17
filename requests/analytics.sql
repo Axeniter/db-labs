@@ -85,3 +85,48 @@ WHERE t.is_available = 1
         AND DATE(o.created_at) = DATE('now')
   )
 ORDER BY t.capacity, t.number;
+
+-- средние величины по дням недели
+WITH DailyStats AS (
+    SELECT 
+        DATE(created_at) AS date,
+        CAST(strftime('%w', created_at) AS INTEGER) AS day_number,
+        CASE CAST(strftime('%w', created_at) AS INTEGER)
+            WHEN 0 THEN 'Воскресенье'
+            WHEN 1 THEN 'Понедельник'
+            WHEN 2 THEN 'Вторник'
+            WHEN 3 THEN 'Среда'
+            WHEN 4 THEN 'Четверг'
+            WHEN 5 THEN 'Пятница'
+            WHEN 6 THEN 'Суббота'
+        END AS week_day,
+        COUNT(*) AS orders_per_day,
+        SUM(to_pay) AS revenue_per_day,
+        AVG(to_pay) AS average_check_per_day
+    FROM Orders
+    GROUP BY date
+)
+SELECT 
+    week_day,
+    ROUND(AVG(orders_per_day), 0) AS average_orders,
+    ROUND(AVG(revenue_per_day), 2) AS average_revenue,
+    ROUND(AVG(average_check_per_day), 2) AS average_check
+FROM DailyStats
+GROUP BY day_number, week_day
+ORDER BY day_number;
+
+-- ингредиенты прибывшие на склад за определенный период (апрель 2026)
+SELECT 
+    i.name AS ingredient,
+    SUM(soi.quantity) AS quantity_of_delivered,
+    u.name AS unit,
+    COUNT(DISTINCT soi.supplier_order_id) AS count_of_supplies,
+    ROUND(SUM(soi.total_cost), 2) AS money_spent
+FROM SupplierOrderItems AS soi
+JOIN SupplierOrders AS so ON soi.supplier_order_id = so.id
+JOIN Ingredients AS i ON soi.ingredient_id = i.id
+JOIN Units AS u ON soi.unit_id = u.id
+WHERE so.delivery_date BETWEEN '2026-04-01' AND '2026-04-30'
+  AND so.status_id = (SELECT id FROM SupplyStatuses WHERE name = 'Доставлено')
+GROUP BY i.id, i.name, u.name
+ORDER BY quantity_of_delivered DESC;

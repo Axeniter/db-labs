@@ -18,7 +18,7 @@ SELECT
     6
 WHERE NOT EXISTS (
     SELECT 1 
-    FROM TableReservations tr
+    FROM TableReservations AS tr
     WHERE tr.table_id = 5
       AND tr.reservation_date = '2026-04-20'
       AND (
@@ -44,9 +44,9 @@ SELECT
     TIME(tr.reservation_time, '+' || tr.duration_minutes || ' minutes') AS reservation_time_end,
     tr.customer_phone AS customer_phone,
     e.first_name || ' ' || e.last_name AS created_by
-FROM TableReservations tr
-JOIN Tables t ON tr.table_id = t.id
-JOIN Employees e ON tr.created_by_employee_id = e.id
+FROM TableReservations AS tr
+JOIN Tables AS t ON tr.table_id = t.id
+JOIN Employees AS e ON tr.created_by_employee_id = e.id
 WHERE tr.table_id = 5 
   AND tr.reservation_date = '2026-04-20'
   AND tr.reservation_time = '19:00:00'

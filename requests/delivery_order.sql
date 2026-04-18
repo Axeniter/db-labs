@@ -98,4 +98,5 @@ FROM OrderItems AS oi
 JOIN MenuItems AS mi ON oi.menu_item_id = mi.id
 WHERE oi.order_id = (SELECT order_id FROM temp_order_id);
 
+-- очистка временной таблицы
 DROP TABLE IF EXISTS temp_order_id;

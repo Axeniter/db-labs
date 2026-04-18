@@ -28,7 +28,7 @@ WHERE o.id = (SELECT order_id FROM temp_order_id);
 CREATE TEMP TABLE temp_financial_id AS
 SELECT last_insert_rowid() AS financial_id;
 
--- обновляем заказ: статус "Завершён", время закрытия, привязываем фин. транзакцию
+-- обновляем заказ: статус "Завершён", время закрытия, привязываем финансовую транзакцию
 UPDATE Orders
 SET 
     status_id = (SELECT id FROM OrderStatuses WHERE name = 'Завершён'),

@@ -36,17 +36,16 @@ GROUP BY ri.ingredient_id, ri.unit_id;
 -- обновляем остатки на складе
 UPDATE IngredientInventory
 SET quantity = quantity - (
-    SELECT SUM(ri.quantity * oi.quantity)
-    FROM OrderItems AS oi
-    JOIN RecipeItems AS ri ON oi.menu_item_id = ri.menu_item_id
-    WHERE oi.order_id = (SELECT order_id FROM temp_order_id)
-    AND ri.ingredient_id = IngredientInventory.ingredient_id
+    SELECT ioi.amount
+    FROM IngredientOperationItems AS ioi
+    WHERE ioi.operation_id = (SELECT operation_id FROM temp_operation_id)
+    AND ioi.ingredient_id = IngredientInventory.ingredient_id
+    AND ioi.unit_id = IngredientInventory.unit_id
 )
 WHERE ingredient_id IN (
-    SELECT DISTINCT ri.ingredient_id
-    FROM OrderItems AS oi
-    JOIN RecipeItems AS ri ON oi.menu_item_id = ri.menu_item_id
-    WHERE oi.order_id = (SELECT order_id FROM temp_order_id)
+    SELECT ingredient_id
+    FROM IngredientOperationItems
+    WHERE operation_id = (SELECT operation_id FROM temp_operation_id)
 );
 
 COMMIT;

@@ -62,9 +62,9 @@ def create_table_reservation(
     )
     
     session.add(new_reservation)
-    session.flush()
+    session.commit()
     
-    result_query = (
+    result = (
         select(
             Table.number.label("table_number"),
             Table.capacity.label("table_capacity"),
@@ -84,11 +84,8 @@ def create_table_reservation(
         .join(TableReservation.created_by_employee)
         .where(TableReservation.id == new_reservation.id)
     )
-
-    result = session.execute(result_query).mappings().first()
-    session.commit()
     
-    return result
+    return session.execute(result).mappings().first()
 
 
 def main():

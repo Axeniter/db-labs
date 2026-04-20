@@ -70,6 +70,7 @@ SELECT
     e.first_name || ' ' || e.last_name AS waiter,
     o.comment AS comment,
     o.total_cost AS total_cost,
+    o.to_pay AS to_pay,
     c.first_name || ' ' || c.last_name AS customer,
     c.phone AS customer_phone
 FROM Orders AS o

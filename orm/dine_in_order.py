@@ -17,15 +17,12 @@ def create_dine_in_order(
 ):
     """Создание заказа из зала"""
     
-    customer_id = (
-        select(Customer.id)
+    customer_id = session.execute(select(Customer.id)
         .where(Customer.phone == customer_phone)
-    )
-    
-    customer = session.execute(customer_id).scalar()
+    ).scalar()
     
     new_order = Order(
-        customer_id=customer,
+        customer_id=customer_id,
         status_id=status_id,
         payment_type_id=payment_type_id,
         total_cost=0,
@@ -37,11 +34,9 @@ def create_dine_in_order(
     session.flush()
     
     for item in items:
-        menu_item_price = (
-            select(MenuItem.price)
+        price = session.execute(select(MenuItem.price)
             .where(MenuItem.id == item["menu_item_id"])
-        )
-        price = session.execute(menu_item_price).scalar()
+        ).scalar()
         
         order_item = OrderItem(
             order_id=new_order.id,
@@ -53,19 +48,14 @@ def create_dine_in_order(
     
     session.flush()
     
-    total_cost_result = (
-        select(func.sum(OrderItem.item_cost * OrderItem.quantity))
+    total_cost = session.execute(select(func.sum(OrderItem.item_cost * OrderItem.quantity))
         .where(OrderItem.order_id == new_order.id)
-    )
-    total_cost = session.execute(total_cost_result).scalar() or 0
+    ).scalar() or 0
     
-    discount_result = (
-        select(func.coalesce(LoyaltyTier.discount_percent, 0))
+    discount_percent = session.execute(select(func.coalesce(LoyaltyTier.discount_percent, 0))
         .select_from(Customer)
         .join(Customer.last_achieved_tier)
-        .where(Customer.id == customer)
-    )
-    discount_percent = session.execute(discount_result).scalar() or 0
+        .where(Customer.id == customer_id)).scalar() or 0
 
     to_pay = round(total_cost * (1 - discount_percent / Decimal('100')), 2)
     
@@ -81,8 +71,7 @@ def create_dine_in_order(
     session.add(dine_in)
     session.commit()
     
-    order_info = (
-        select(
+    order_info = session.execute(select(
             Order.id.label("order_id"),
             func.strftime('%Y-%m-%d %H:%M:%S', Order.created_at).label("created_at"),
             OrderStatus.name.label("status"),
@@ -102,12 +91,9 @@ def create_dine_in_order(
         .join(DineIn.employee)
         .outerjoin(Order.customer)
         .where(Order.id == new_order.id)
-    )
+    ).mappings().first()
     
-    result_order = session.execute(order_info).mappings().first()
-    
-    order_items = (
-        select(
+    items_info = session.execute(select(
             MenuItem.name.label("item"),
             OrderItem.quantity.label("quantity"),
             OrderItem.item_cost.label("price_per_item"),
@@ -115,13 +101,11 @@ def create_dine_in_order(
         )
         .join(OrderItem.menu_item)
         .where(OrderItem.order_id == new_order.id)
-    )
-    
-    result_items = session.execute(order_items).mappings().all()
+    ).mappings().all()
     
     return {
-        "order": result_order,
-        "items": result_items
+        "order": order_info,
+        "items": items_info
     }
 
 

@@ -58,7 +58,6 @@ def create_order(
     
     discount_percent = session.execute(
         select(func.coalesce(LoyaltyTier.discount_percent, 0))
-        .select_from(Customer)
         .join(Customer.last_achieved_tier)
         .where(Customer.id == customer_id)
     ).scalar() or 0

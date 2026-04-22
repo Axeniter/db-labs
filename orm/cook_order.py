@@ -8,20 +8,24 @@ from datetime import datetime
 def cook_order(session, employee_id: int):
     """Начать готовку первого заказа в статусе 'В ожидании'"""
     
-    pending_status_id = session.execute(select(OrderStatus.id)
-                    .where(OrderStatus.name == 'В ожидании')
+    pending_status_id = session.execute(
+        select(OrderStatus.id)
+        .where(OrderStatus.name == 'В ожидании')
     ).scalar()
     
-    cooking_status_id = session.execute(select(OrderStatus.id)
-                .where(OrderStatus.name == 'Готовится')
+    cooking_status_id = session.execute(
+        select(OrderStatus.id)
+        .where(OrderStatus.name == 'Готовится')
     ).scalar()
     
 
-    using_operation_id = session.execute(select(IngredientOperationType.id)
-                    .where(IngredientOperationType.name == 'Использование')
+    using_operation_id = session.execute(
+        select(IngredientOperationType.id)
+        .where(IngredientOperationType.name == 'Использование')
     ).scalar()
     
-    order_id = session.execute(select(Order.id)
+    order_id = session.execute(
+        select(Order.id)
         .where(Order.status_id == pending_status_id)
         .order_by(Order.created_at)
         .limit(1)
@@ -43,7 +47,8 @@ def cook_order(session, employee_id: int):
     session.add(ingredient_operation)
     session.flush()
     
-    ingredients_to_deduct = session.execute(select(
+    ingredients_to_deduct = session.execute(
+        select(
             RecipeItem.ingredient_id,
             RecipeItem.unit_id,
             func.sum(RecipeItem.quantity * OrderItem.quantity).label('total_amount')
@@ -77,7 +82,8 @@ def cook_order(session, employee_id: int):
     
     session.commit()
     
-    order_info = session.execute(select(
+    order_info = session.execute(
+        select(
             Order.id.label("order_id"),
             OrderStatus.name.label("order_status"),
             func.strftime('%Y-%m-%d %H:%M:%S', Order.created_at).label("order_created"),
@@ -98,7 +104,8 @@ def cook_order(session, employee_id: int):
         .where(Order.id == order_id)
     ).mappings().first()
     
-    items_info = session.execute(select(
+    items_info = session.execute(
+        select(
             MenuItem.name.label("dish"),
             OrderItem.quantity.label("quantity"),
             OrderItem.item_cost.label("price"),
@@ -111,7 +118,6 @@ def cook_order(session, employee_id: int):
                 ), ', '
             ).label("ingredients_used")
         )
-        .select_from(OrderItem)
         .join(OrderItem.menu_item)
         .outerjoin(MenuItem.recipe_items)
         .outerjoin(RecipeItem.ingredient)
@@ -126,12 +132,12 @@ def cook_order(session, employee_id: int):
         .order_by(MenuItem.name)
     ).mappings().all()
     
-    inventory_info = session.execute(select(
+    inventory_info = session.execute(
+        select(
             Ingredient.name.label("ingredient"),
             IngredientInventory.quantity.label("current_stock"),
             Unit.name.label("unit")
         )
-        .select_from(IngredientInventory)
         .join(IngredientInventory.ingredient)
         .join(IngredientInventory.unit)
         .where(

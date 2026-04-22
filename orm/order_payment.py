@@ -142,7 +142,6 @@ def close_order(session):
             FinancialTransactionCategory.name.label("financial_category"),
             FinancialTransaction.id.label("financial_transaction_id")
         )
-        .select_from(Order)
         .join(Order.status)
         .join(Order.payment_type)
         .join(Order.financial_transaction)
@@ -158,7 +157,6 @@ def close_order(session):
             OrderItem.item_cost.label("price"),
             (OrderItem.quantity * OrderItem.item_cost).label("total_price")
         )
-        .select_from(OrderItem)
         .join(OrderItem.menu_item)
         .where(OrderItem.order_id == order.id)
         .order_by(OrderItem.created_at)
@@ -183,7 +181,6 @@ def close_order(session):
                 LoyaltyTransaction.points_amount.label("earned_cashback"),
                 LoyaltyTransaction.description.label("cashback_description")
             )
-            .select_from(Order)
             .join(Order.customer)
             .join(Customer.last_achieved_tier)
             .join(Order.loyalty_transactions)
@@ -201,7 +198,6 @@ def close_order(session):
                 Delivery.address.label("delivery_address"),
                 func.concat(Courier.first_name, ' ', Courier.last_name).label("courier")
             )
-            .select_from(Delivery)
             .join(Delivery.delivery_status)
             .join(Delivery.courier)
             .where(Delivery.order_id == order.id)

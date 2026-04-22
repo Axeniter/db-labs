@@ -107,7 +107,6 @@ def complete_order(session):
             Order.to_pay.label("to_pay"),
             PaymentType.name.label("payment_type")
         )
-        .select_from(Order)
         .join(Order.status)
         .join(Order.payment_type)
         .outerjoin(Order.delivery)
@@ -129,7 +128,6 @@ def complete_order(session):
                 (func.julianday(OrderItem.cooked_at) - func.julianday(OrderItem.created_at)) * 24 * 60
             ).label("cooking_minutes")
         )
-        .select_from(OrderItem)
         .join(OrderItem.menu_item)
         .where(OrderItem.order_id == order_id)
         .order_by(OrderItem.created_at)
@@ -145,7 +143,6 @@ def complete_order(session):
                 Delivery.address.label("delivery_address"),
                 DeliveryStatus.name.label("delivery_status")
             )
-            .select_from(Delivery)
             .join(Delivery.courier)
             .join(Courier.company)
             .join(Delivery.delivery_status)
@@ -161,7 +158,6 @@ def complete_order(session):
                 Table.location.label("table_location"),
                 DineInStatus.name.label("dine_in_status")
             )
-            .select_from(DineIn)
             .join(DineIn.employee)
             .join(DineIn.table)
             .join(DineIn.status)
